@@ -1,13 +1,16 @@
-import openai
 import os 
 import evadb 
+import samply.py
 
 
-openai.api_key = "api-key"
 
 
 def read_codebase(directory):
-    return
+    codebase = ""
+    for filename in os.listdir(directory):
+        with open(os.path.join(directory, filename), 'r') as f:
+            codebase += f.read()
+    return codebase
 
 
 def generate_solution(prompt):
