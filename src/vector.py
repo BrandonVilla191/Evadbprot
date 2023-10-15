@@ -1,6 +1,17 @@
 import evadb
 import os
 import pandas as pd
+import re
+
+def preprocess_python_code(code):
+    # Remove single line comments
+    code = re.sub(r'#.*?\n', '\n', code)
+    
+    # Remove multi-line string literals (often used as comments)
+    code = re.sub(r"'''(.*?)'''", '', code, flags=re.DOTALL)  # Remove triple-single-quoted strings
+    code = re.sub(r'"""(.*?)"""', '', code, flags=re.DOTALL)  # Remove triple-double-quoted strings
+    
+    return code.strip()
 
 # Set the display options
 pd.set_option('display.max_columns', None)
@@ -28,11 +39,13 @@ strin = ""
 with open("sample.py", "r") as file:
     for line in file:
         if line.strip():
-            query = f"INSERT INTO vectors (id, vector) VALUES (1, '{line}')"
+            strin += line
             
 print("Inserting vectors...")
-safe_strin = strin.replace("'", "''")
-query = f"INSERT INTO vectors (id, vector) VALUES (1, '{safe_strin}')"
+# Remove comments
+code = preprocess_python_code(strin)
+print("CODE", code)
+query = f"INSERT INTO vectors (id, vector) VALUES (1, '{code}')"
 print(cursor.query(query).execute())
 
 
